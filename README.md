@@ -2,7 +2,7 @@
 
 A simple Event driven architecture that shows how communication between replicas of the same service works. This codebase shows a demo project of how multiple replicas of a server (lets call it **producer**) know about the correct server number they are associated to and what the total number of servers at any given moment.
 
-An architecture diagram of a much bigger system is seen below: (The draw.io file is seen in the docs folder)
+An architecture diagram of a much bigger system is seen below: ([Arch Draw.io file](docs/Mockstagram.drawio))
 
 <div style="text-align:center"><img src="docs/mockstagram-arch-overview.png"  /></div>
 
@@ -27,11 +27,11 @@ At any given time, if any of the producer replicas want to know what their serve
   > skaffold dev
 ```
 
-When you run the above command, you will see the docker images being built for the services:"
+When you run the above command, you will see the docker images being built for the services:
 
 - mk-producer (4 replicas as seen in the mk-producer-depl.yaml file)
 - mk-nurse
-- nats-streaming-server
+- nats-streaming
 - redis
 
 After the images are built, they shall be deployed on your default k8s cluster namespace, and you will see the logs of all the **services** exposed on that same terminal. View [docs/terminalLogs.md](docs/terminalLogs.md) to view an in depth example.
