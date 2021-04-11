@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-depl
+spec:
+  replicas: 1 # Simple standalone redis
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - containerPort: 6379
+---
+# Redis cluster IP Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-srv
+spec:
+  type: ClusterIP
+  # Selects deployments with label app="redis"
+  selector:
+    app: redis
+  ports:
+    - name: redis-db
+      protocol: TCP
+      port: 6379
+      targetPort: 6379

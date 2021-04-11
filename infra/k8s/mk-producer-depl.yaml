@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mk-producer-depl
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: mk-producer
+  template:
+    metadata:
+      labels:
+        app: mk-producer
+    spec:
+      containers:
+        - name: mk-producer
+          image: gammaspeck/mk-producer
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+
+            - name: NATS_CLUSTER_ID
+              value: mockstagram
+
+            - name: REDIS_HOST
+              value: redis-srv

@@ -1,0 +1,22 @@
+{
+  "name": "mk-producer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Madhu KM",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node-dev --poll src/index.ts"
+  },
+  "devDependencies": {
+    "@types/ioredis": "^4.22.3",
+    "@types/node": "^14.14.37",
+    "prettier": "^2.2.1",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "ioredis": "^4.26.0",
+    "nanoid": "^3.1.22",
+    "node-nats-streaming": "^0.3.2"
+  }
+}
