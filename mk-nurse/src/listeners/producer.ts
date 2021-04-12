@@ -1,6 +1,7 @@
 import { Message } from 'node-nats-streaming'
 import { ProducerStoppedEvent, Listener, Subjects, ProducerStartedEvent } from '../common/events'
-import { redisWrapper } from '../common/libs'
+import { natsWrapper, redisWrapper } from '../common/libs'
+import { NurseUpdatedRedisPublisher } from '../publishers/nurse'
 import { QUEUE_GROUP_NAME } from './queue-group-name'
 
 export class ProducerStoppedListener extends Listener<ProducerStoppedEvent> {
@@ -61,6 +62,9 @@ export class ProducerStoppedListener extends Listener<ProducerStoppedEvent> {
     console.log('Latest Total', finalTotal)
     console.log('-----------------------------------------------------------\n')
 
+    // Update other Producers that Redis has been updated
+    new NurseUpdatedRedisPublisher(natsWrapper.client).publish({ deadServerName: data.serverName })
+
     msg.ack()
   }
 }
@@ -71,7 +75,7 @@ export class ProducerStartedListener extends Listener<ProducerStartedEvent> {
 
   async onMessage(data: ProducerStartedEvent['data'], msg: Message) {
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-    console.log(`MK Producer: ${data.serverName} hsa been started`)
+    console.log(`MK Producer: ${data.serverName} been started`)
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
 
     msg.ack()

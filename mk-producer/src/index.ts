@@ -1,9 +1,9 @@
 import { natsWrapper, redisWrapper } from '../common/libs'
 import { ProducerStartedPublisher, ProducerStoppedPublisher } from './publishers/producer'
-import { nanoid } from 'nanoid'
+import { SERVER_NAME, setServerNumber, getServerNumber } from './local-cache'
+import { NurseUpdatedRedisListener } from './listeners/nurse'
 
 /** Server name is assigned at time of server creation */
-const SERVER_NAME = nanoid()
 
 const start = async () => {
   if (!process.env.NATS_CLIENT_ID) throw new Error('NATS_CLIENT_ID must be defined')
@@ -34,9 +34,11 @@ const start = async () => {
     // Initial server setup
     if (!total) {
       // Register new 1st server onto redis
+      await redis.set('mockstagram:TOTAL', 1)
+
       await redis.hset('mockstagram', SERVER_NAME, 1)
       // Update total=1 for first server on redis
-      await redis.set('mockstagram:TOTAL', 1)
+      setServerNumber(1)
       console.log('First server registered, and total num of servers: 1')
     } else {
       console.log('I am not the first server. Existing servers:', existingMap)
@@ -45,6 +47,7 @@ const start = async () => {
       await redis.hset('mockstagram', SERVER_NAME, newTotal)
       // Update total num of servers on redis
       await redis.set('mockstagram:TOTAL', newTotal)
+      setServerNumber(newTotal)
     }
 
     const finalRedisMapState = await redis.hgetall('mockstagram')
@@ -56,6 +59,9 @@ const start = async () => {
 
     // Announce birth 😄
     new ProducerStartedPublisher(nats).publish({ serverName: SERVER_NAME })
+
+    // Listen to Nurse Events 💉
+    new NurseUpdatedRedisListener(nats).listen()
 
     // Announce Death 💀
     process.on('SIGINT', () => {
